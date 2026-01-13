@@ -1,7 +1,4 @@
-"""
-Script para crear las tablas necesarias en PostgreSQL
-Debe ejecutarse después de crear la base de datos con postgres_create_db.py
-"""
+
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -13,9 +10,6 @@ Base = declarative_base()
 
 
 class RequestParams(Base):
-    """
-    Tabla para almacenar parámetros de solicitudes de precios históricos
-    """
     __tablename__ = 'request_params'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -33,9 +27,7 @@ class RequestParams(Base):
 
 
 class HistPricesResults(Base):
-    """
-    Tabla para almacenar resultados de precios históricos
-    """
+
     __tablename__ = 'hist_prices_results'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -55,7 +47,6 @@ class HistPricesResults(Base):
 
 
 def create_tables():
-    """Crea todas las tablas en la base de datos"""
     try:
         # Crear motor de conexión a PostgreSQL
         engine = create_engine(

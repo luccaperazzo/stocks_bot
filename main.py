@@ -10,7 +10,6 @@ from telebot.asyncio_handler_backends import State, StatesGroup
 from telebot.asyncio_storage import StateMemoryStorage
 import asyncio
 
-# Importar módulos propios
 from config import bot_token
 import keyboard
 import utils
@@ -18,15 +17,10 @@ from historical_prices import get_historical_prices_chart
 from sma import get_sma_analysis
 from full_data import get_full_data
 
-# Crear instancia del bot con almacenamiento de estados
 state_storage = StateMemoryStorage()
 bot = AsyncTeleBot(bot_token, state_storage=state_storage)
 
-
-
-# Definir estados para el flujo de conversación
 class HistoricalPricesStates(StatesGroup):
-    """Estados para el flujo de Historical Prices"""
     ticker = State()
     start_date = State()
     end_date = State()
@@ -36,18 +30,11 @@ class HistoricalPricesStates(StatesGroup):
 
 
 class SMAStates(StatesGroup):
-    """Estados para el flujo de SMA Analysis"""
     ticker = State()
 
 
 class FullDataStates(StatesGroup):
-    """Estados para el flujo de Full Data"""
     ticker = State()
-
-
-# ============================================
-# COMANDOS PRINCIPALES
-# ============================================
 
 @bot.message_handler(commands=['start'])
 async def start_command(message):
@@ -62,7 +49,6 @@ async def start_command(message):
 
 @bot.message_handler(commands=['Guide'])
 async def guide_command(message):
-    """Comando /Guide - Muestra la guía de uso"""
     await bot.send_message(
         message.chat.id,
         utils.GUIDE_MESSAGE,
@@ -72,13 +58,11 @@ async def guide_command(message):
 
 @bot.message_handler(commands=['Historical_prices'])
 async def historical_prices_command(message):
-    """Comando /Historical_prices - Inicia el flujo de precios históricos"""
     await start_historical_prices(message)
 
 
 @bot.message_handler(commands=['SMA'])
 async def sma_command(message):
-    """Comando /SMA - Inicia el flujo de análisis SMA"""
     await start_sma_analysis(message)
 
 
@@ -88,32 +72,27 @@ async def sma_command(message):
 
 @bot.message_handler(func=lambda message: message.text == "📈 Historical Prices")
 async def historical_prices_button(message):
-    """Botón de Historical Prices"""
     await start_historical_prices(message)
 
 
 @bot.message_handler(func=lambda message: message.text == "📊 SMA Analysis")
 async def sma_button(message):
-    """Botón de SMA Analysis"""
     print(f"🔵 DEBUG: SMA button pressed by user {message.from_user.id}")
     await start_sma_analysis(message)
 
 
 @bot.message_handler(func=lambda message: message.text == "📋 Full Data")
 async def full_data_button(message):
-    """Botón de Full Data"""
     await start_full_data(message)
 
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ Guide")
 async def guide_button(message):
-    """Botón de Guide"""
     await guide_command(message)
 
 
 @bot.message_handler(func=lambda message: message.text in ["🔙 Back to Menu", "❌ Cancel"])
 async def back_to_menu(message):
-    """Botón para volver al menú principal"""
     await bot.delete_state(message.from_user.id, message.chat.id)
     await bot.send_message(
         message.chat.id,
@@ -127,7 +106,6 @@ async def back_to_menu(message):
 # ============================================
 
 async def start_historical_prices(message):
-    """Inicia el flujo de Historical Prices"""
     await bot.set_state(message.from_user.id, HistoricalPricesStates.ticker, message.chat.id)
     await bot.send_message(
         message.chat.id,
@@ -137,7 +115,6 @@ async def start_historical_prices(message):
 
 
 async def process_ticker_historical(message):
-    """Procesa el ticker ingresado"""
     ticker = message.text.strip()
     
     # Validar ticker
@@ -155,7 +132,6 @@ async def process_ticker_historical(message):
 
 
 async def process_start_date(message):
-    """Procesa la fecha inicial"""
     start_date = message.text.strip()
     
     # Validar fecha
@@ -173,7 +149,6 @@ async def process_start_date(message):
 
 
 async def process_end_date(message):
-    """Procesa la fecha final"""
     end_date = message.text.strip()
     
     # Validar fecha
@@ -191,7 +166,6 @@ async def process_end_date(message):
 
 
 async def process_multiplier(message):
-    """Procesa el multiplicador"""
     multiplier_str = message.text.strip()
     
     # Validar multiplicador
@@ -213,7 +187,6 @@ async def process_multiplier(message):
 
 
 async def process_period(message):
-    """Procesa el periodo"""
     period = message.text.strip()
     
     # Validar periodo
@@ -235,7 +208,6 @@ async def process_period(message):
 
 
 async def process_chart_type(message):
-    """Procesa el tipo de gráfico y genera el resultado"""
     chart_type = message.text.strip()
     
     # Validar tipo de gráfico
@@ -296,7 +268,6 @@ async def process_chart_type(message):
 # ============================================
 
 async def start_sma_analysis(message):
-    """Inicia el flujo de SMA Analysis"""
     print(f"🟢 DEBUG: Starting SMA analysis for user {message.from_user.id}")
     await bot.set_state(message.from_user.id, SMAStates.ticker, message.chat.id)
     print(f"🟡 DEBUG: State set to SMAStates.ticker")
@@ -309,7 +280,6 @@ async def start_sma_analysis(message):
 
 
 async def process_ticker_sma(message):
-    """Procesa el ticker para análisis SMA"""
     print(f"🔴 DEBUG: Processing ticker in SMA state. Message: {message.text}")
     ticker = message.text.strip()
     
@@ -354,7 +324,6 @@ async def process_ticker_sma(message):
 # ============================================
 
 async def start_full_data(message):
-    """Inicia el flujo de Full Data"""
     await bot.set_state(message.from_user.id, FullDataStates.ticker, message.chat.id)
     await bot.send_message(
         message.chat.id,
@@ -364,7 +333,6 @@ async def start_full_data(message):
 
 
 async def process_ticker_full_data(message):
-    """Procesa el ticker para Full Data"""
     ticker = message.text.strip()
     
     # Validar ticker
@@ -403,7 +371,6 @@ async def process_ticker_full_data(message):
 # Handler que maneja TODOS los mensajes de texto y verifica estados manualmente
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 async def handle_text_messages(message):
-    """Handler universal que verifica estados y procesa mensajes"""
     # Obtener estado actual
     current_state = await bot.get_state(message.from_user.id, message.chat.id)
     print(f"⚪ DEBUG: Message='{message.text}', State={current_state}")
@@ -449,7 +416,6 @@ async def handle_text_messages(message):
 # ============================================
 
 async def main():
-    """Función principal para ejecutar el bot"""
     print("🤖 Bot de Telegram iniciado...")
     print("✅ Esperando mensajes...")
     

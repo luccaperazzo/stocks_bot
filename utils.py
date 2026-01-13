@@ -1,7 +1,4 @@
-"""
-Utilidades y strings de ayuda para el bot
-Contiene mensajes, instrucciones y funciones auxiliares
-"""
+
 
 # Mensaje de bienvenida
 WELCOME_MESSAGE = """
@@ -86,16 +83,12 @@ STATUS_CACHE_MISS = "ℹ️ Datos no encontrados en caché. Consultando API..."
 
 
 def validate_ticker(ticker: str) -> bool:
-    """
-    Valida que el ticker esté en mayúsculas y sea alfanumérico
-    """
+  
     return ticker.isupper() and ticker.isalpha() and 1 <= len(ticker) <= 10
 
 
 def validate_date(date_str: str) -> bool:
-    """
-    Valida que la fecha tenga el formato YYYY-MM-DD
-    """
+
     from datetime import datetime
     try:
         datetime.strptime(date_str, '%Y-%m-%d')
@@ -105,9 +98,7 @@ def validate_date(date_str: str) -> bool:
 
 
 def validate_multiplier(multiplier_str: str) -> bool:
-    """
-    Valida que el multiplicador sea un número entero positivo
-    """
+
     try:
         mult = int(multiplier_str)
         return mult > 0
@@ -116,32 +107,24 @@ def validate_multiplier(multiplier_str: str) -> bool:
 
 
 def validate_period(period: str) -> bool:
-    """
-    Valida que el periodo sea uno de los permitidos
-    """
+
     valid_periods = ['day', 'week', 'month', 'quarter', 'year']
     return period in valid_periods
 
 
 def validate_chart_type(chart_type: str) -> bool:
-    """
-    Valida que el tipo de gráfico sea válido
-    """
+
     valid_types = ['candle', 'line']
     return chart_type in valid_types
 
 
 def format_price(price: float) -> str:
-    """
-    Formatea un precio a formato USD
-    """
+
     return f"${price:,.2f}"
 
 
 def format_large_number(num: float) -> str:
-    """
-    Formatea números grandes (volumen)
-    """
+
     if num >= 1_000_000_000:
         return f"{num/1_000_000_000:.2f}B"
     elif num >= 1_000_000:

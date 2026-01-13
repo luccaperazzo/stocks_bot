@@ -1,14 +1,9 @@
-"""
-Script para crear la base de datos de PostgreSQL
-Este script debe ejecutarse primero antes de crear las tablas
-"""
 
 import psycopg
 from config import postgres_user, postgres_password, postgres_host, postgres_port, postgres_db
 
 
 def create_database():
-    """Crea la base de datos stocks_db en PostgreSQL"""
     try:
         # Conectar a PostgreSQL (a la base de datos por defecto 'postgres')
         connection = psycopg.connect(

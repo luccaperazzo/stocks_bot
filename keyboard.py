@@ -7,9 +7,7 @@ from telebot import types
 
 
 def main_menu():
-    """
-    Menú principal del bot con opciones disponibles
-    """
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     
     btn1 = types.KeyboardButton("📈 Historical Prices")
@@ -24,9 +22,7 @@ def main_menu():
 
 
 def chart_type_keyboard():
-    """
-    Teclado para seleccionar el tipo de gráfico
-    """
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     
     btn1 = types.KeyboardButton("candle")
@@ -38,9 +34,7 @@ def chart_type_keyboard():
 
 
 def period_keyboard():
-    """
-    Teclado para seleccionar el periodo de tiempo
-    """
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=3)
     
     btn1 = types.KeyboardButton("day")
@@ -56,9 +50,7 @@ def period_keyboard():
 
 
 def back_to_menu_keyboard():
-    """
-    Teclado para regresar al menú principal
-    """
+ 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     
     btn = types.KeyboardButton("🔙 Back to Menu")
@@ -68,9 +60,7 @@ def back_to_menu_keyboard():
 
 
 def cancel_keyboard():
-    """
-    Teclado para cancelar la operación actual
-    """
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     
     btn = types.KeyboardButton("❌ Cancel")

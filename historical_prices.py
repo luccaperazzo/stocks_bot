@@ -1,7 +1,4 @@
-"""
-Módulo para obtener precios históricos de acciones
-Incluye integración con API de Polygon.io y caché en PostgreSQL
-"""
+
 
 import os
 import requests
@@ -23,12 +20,7 @@ Session = sessionmaker(bind=engine)
 
 
 def check_cache(ticker, multiplier, timespan, from_date, to_date):
-    """
-    Verifica si los datos ya existen en la caché de PostgreSQL
-    
-    Returns:
-        pandas.DataFrame o None si no hay datos en caché
-    """
+
     session = Session()
     try:
         # Buscar parámetros de solicitud coincidentes
@@ -75,9 +67,7 @@ def check_cache(ticker, multiplier, timespan, from_date, to_date):
 
 
 def save_to_cache(ticker, multiplier, timespan, from_date, to_date, df):
-    """
-    Guarda los resultados en la caché de PostgreSQL
-    """
+
     session = Session()
     try:
         # Crear nuevo registro de parámetros
@@ -115,19 +105,7 @@ def save_to_cache(ticker, multiplier, timespan, from_date, to_date, df):
 
 
 def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
-    """
-    Obtiene precios históricos desde la API de Polygon.io
-    
-    Args:
-        ticker: Símbolo de la acción (ej: AAPL)
-        multiplier: Multiplicador de tiempo
-        timespan: Periodo (day, week, month, etc.)
-        from_date: Fecha inicial (YYYY-MM-DD)
-        to_date: Fecha final (YYYY-MM-DD)
-    
-    Returns:
-        pandas.DataFrame con los datos históricos
-    """
+
     # Primero verificar caché
     print("🔍 Verificando caché...")
     cached_data = check_cache(ticker, multiplier, timespan, from_date, to_date)
@@ -190,18 +168,7 @@ def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
 
 
 def generate_chart(df, ticker, chart_type='candle', output_path='periodic_historical_fig/chart.png'):
-    """
-    Genera un gráfico financiero usando mplfinance
-    
-    Args:
-        df: DataFrame con datos OHLCV
-        ticker: Símbolo de la acción
-        chart_type: 'candle' o 'line'
-        output_path: Ruta donde guardar el gráfico
-    
-    Returns:
-        Ruta del archivo generado o None en caso de error
-    """
+
     try:
         # Configurar el estilo
         mc = mpf.make_marketcolors(
@@ -259,12 +226,7 @@ def generate_chart(df, ticker, chart_type='candle', output_path='periodic_histor
 
 
 def get_historical_prices_chart(ticker, multiplier, timespan, from_date, to_date, chart_type='candle'):
-    """
-    Función principal para obtener precios históricos y generar gráfico
-    
-    Returns:
-        Ruta del archivo de gráfico o None en caso de error
-    """
+
     # Obtener datos
     df = fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date)
     

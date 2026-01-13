@@ -1,7 +1,3 @@
-"""
-Archivo de configuración del bot de Telegram
-Contiene tokens, API keys y credenciales de base de datos
-"""
 
 # Token del bot de Telegram (obtener de @BotFather)
 bot_token = "YOUR_TELEGRAM_BOT_TOKEN"

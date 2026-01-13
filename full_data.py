@@ -1,7 +1,4 @@
-"""
-Módulo para obtener información completa de una acción
-Incluye precios actuales, volumen, rangos, etc.
-"""
+
 
 import requests
 from datetime import datetime, timedelta
@@ -10,15 +7,7 @@ from utils import format_price, format_large_number
 
 
 def fetch_ticker_details(ticker):
-    """
-    Obtiene detalles completos de un ticker desde Polygon.io
-    
-    Args:
-        ticker: Símbolo de la acción
-    
-    Returns:
-        dict con información del ticker
-    """
+
     url = f"https://api.polygon.io/v3/reference/tickers/{ticker}"
     
     params = {
@@ -42,15 +31,7 @@ def fetch_ticker_details(ticker):
 
 
 def fetch_latest_quote(ticker):
-    """
-    Obtiene la cotización más reciente de una acción
-    
-    Args:
-        ticker: Símbolo de la acción
-    
-    Returns:
-        dict con datos de cotización
-    """
+
     # Obtener último día de trading - usar datos de hace unos días para evitar problemas con plan gratuito
     to_date = datetime.now() - timedelta(days=3)  # Datos de hace 3 días
     from_date = to_date - timedelta(days=10)  # Últimos 10 días para asegurar que obtenemos datos
@@ -86,15 +67,7 @@ def fetch_latest_quote(ticker):
 
 
 def get_full_data(ticker):
-    """
-    Obtiene información completa de una acción
-    
-    Args:
-        ticker: Símbolo de la acción
-    
-    Returns:
-        String formateado con toda la información
-    """
+
     print(f"📋 Obteniendo datos completos para {ticker}...")
     
     # Obtener detalles del ticker
