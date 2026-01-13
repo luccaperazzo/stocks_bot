@@ -1,0 +1,30 @@
+# Archivos de configuración con credenciales
+config.py
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# Imágenes generadas
+periodic_historical_fig/*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Base de datos local
+*.db
+*.sqlite3
