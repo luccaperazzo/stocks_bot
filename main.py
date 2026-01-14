@@ -1,8 +1,3 @@
-"""
-Bot de Telegram para análisis de acciones estadounidenses
-Obtiene precios históricos y calcula medias móviles (SMA 200/50)
-"""
-
 import os
 from telebot.async_telebot import AsyncTeleBot
 from telebot import types
@@ -38,7 +33,6 @@ class FullDataStates(StatesGroup):
 
 @bot.message_handler(commands=['start'])
 async def start_command(message):
-    """Comando /start - Inicia el bot y muestra el menú principal"""
     await bot.send_message(
         message.chat.id,
         utils.WELCOME_MESSAGE,
@@ -117,16 +111,13 @@ async def start_historical_prices(message):
 async def process_ticker_historical(message):
     ticker = message.text.strip()
     
-    # Validar ticker
     if not utils.validate_ticker(ticker):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_TICKER)
         return
     
-    # Guardar ticker en el estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['ticker'] = ticker
     
-    # Pasar al siguiente estado
     await bot.set_state(message.from_user.id, HistoricalPricesStates.start_date, message.chat.id)
     await bot.send_message(message.chat.id, utils.PROMPT_START_DATE)
 
@@ -134,16 +125,13 @@ async def process_ticker_historical(message):
 async def process_start_date(message):
     start_date = message.text.strip()
     
-    # Validar fecha
     if not utils.validate_date(start_date):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_DATE)
         return
     
-    # Guardar fecha en el estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['start_date'] = start_date
     
-    # Pasar al siguiente estado
     await bot.set_state(message.from_user.id, HistoricalPricesStates.end_date, message.chat.id)
     await bot.send_message(message.chat.id, utils.PROMPT_END_DATE)
 
@@ -151,16 +139,13 @@ async def process_start_date(message):
 async def process_end_date(message):
     end_date = message.text.strip()
     
-    # Validar fecha
     if not utils.validate_date(end_date):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_DATE)
         return
     
-    # Guardar fecha en el estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['end_date'] = end_date
     
-    # Pasar al siguiente estado
     await bot.set_state(message.from_user.id, HistoricalPricesStates.multiplier, message.chat.id)
     await bot.send_message(message.chat.id, utils.PROMPT_MULTIPLIER)
 
@@ -168,16 +153,13 @@ async def process_end_date(message):
 async def process_multiplier(message):
     multiplier_str = message.text.strip()
     
-    # Validar multiplicador
     if not utils.validate_multiplier(multiplier_str):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_MULTIPLIER)
         return
     
-    # Guardar multiplicador en el estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['multiplier'] = int(multiplier_str)
     
-    # Pasar al siguiente estado
     await bot.set_state(message.from_user.id, HistoricalPricesStates.period, message.chat.id)
     await bot.send_message(
         message.chat.id,
@@ -189,16 +171,13 @@ async def process_multiplier(message):
 async def process_period(message):
     period = message.text.strip()
     
-    # Validar periodo
     if not utils.validate_period(period):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_PERIOD)
         return
     
-    # Guardar periodo en el estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['period'] = period
     
-    # Pasar al siguiente estado
     await bot.set_state(message.from_user.id, HistoricalPricesStates.chart_type, message.chat.id)
     await bot.send_message(
         message.chat.id,
@@ -210,12 +189,10 @@ async def process_period(message):
 async def process_chart_type(message):
     chart_type = message.text.strip()
     
-    # Validar tipo de gráfico
     if not utils.validate_chart_type(chart_type):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_CHART_TYPE)
         return
     
-    # Obtener todos los datos del estado
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         ticker = data['ticker']
         start_date = data['start_date']
@@ -223,16 +200,13 @@ async def process_chart_type(message):
         multiplier = data['multiplier']
         period = data['period']
     
-    # Enviar mensaje de espera
     await bot.send_message(
         message.chat.id,
         utils.SUCCESS_GENERATING_CHART,
         reply_markup=keyboard.main_menu()
     )
     
-    # Generar gráfico (ejecutar en bucle de eventos)
     try:
-        # Ejecutar función síncrona en el bucle de eventos
         loop = asyncio.get_event_loop()
         chart_path = await loop.run_in_executor(
             None,
@@ -241,7 +215,6 @@ async def process_chart_type(message):
         )
         
         if chart_path and os.path.exists(chart_path):
-            # Enviar gráfico
             with open(chart_path, 'rb') as photo:
                 await bot.send_photo(
                     message.chat.id,
@@ -249,7 +222,6 @@ async def process_chart_type(message):
                     caption=f"📈 {ticker} - {start_date} to {end_date}"
                 )
             
-            # Eliminar archivo temporal
             os.remove(chart_path)
             
             await bot.send_message(message.chat.id, utils.SUCCESS_CHART_GENERATED)
@@ -259,7 +231,6 @@ async def process_chart_type(message):
     except Exception as e:
         await bot.send_message(message.chat.id, f"❌ Error: {str(e)}")
     
-    # Limpiar estado
     await bot.delete_state(message.from_user.id, message.chat.id)
 
 
@@ -283,25 +254,21 @@ async def process_ticker_sma(message):
     print(f"🔴 DEBUG: Processing ticker in SMA state. Message: {message.text}")
     ticker = message.text.strip()
     
-    # DEBUG: Verificar estado actual
     current_state = await bot.get_state(message.from_user.id, message.chat.id)
     print(f"🟣 DEBUG: Current state: {current_state}")
     
-    # Validar ticker
     if not utils.validate_ticker(ticker):
         print(f"❌ DEBUG: Invalid ticker: {ticker}")
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_TICKER)
         return
     
     print(f"✅ DEBUG: Valid ticker: {ticker}")
-    # Enviar mensaje de espera
     await bot.send_message(
         message.chat.id,
         utils.SUCCESS_CALCULATING_SMA,
         reply_markup=keyboard.main_menu()
     )
     
-    # Calcular SMA
     try:
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(None, get_sma_analysis, ticker)
@@ -315,7 +282,6 @@ async def process_ticker_sma(message):
     except Exception as e:
         await bot.send_message(message.chat.id, f"❌ Error: {str(e)}")
     
-    # Limpiar estado
     await bot.delete_state(message.from_user.id, message.chat.id)
 
 
@@ -335,19 +301,16 @@ async def start_full_data(message):
 async def process_ticker_full_data(message):
     ticker = message.text.strip()
     
-    # Validar ticker
     if not utils.validate_ticker(ticker):
         await bot.send_message(message.chat.id, utils.ERROR_INVALID_TICKER)
         return
     
-    # Enviar mensaje de espera
     await bot.send_message(
         message.chat.id,
         utils.STATUS_FETCHING_DATA,
         reply_markup=keyboard.main_menu()
     )
     
-    # Obtener datos completos
     try:
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(None, get_full_data, ticker)
@@ -361,21 +324,17 @@ async def process_ticker_full_data(message):
     except Exception as e:
         await bot.send_message(message.chat.id, f"❌ Error: {str(e)}")
     
-    # Limpiar estado
     await bot.delete_state(message.from_user.id, message.chat.id)
 
 
 # ============================================
 # MANEJO DE MENSAJES NO RECONOCIDOS
 # ============================================
-# Handler que maneja TODOS los mensajes de texto y verifica estados manualmente
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 async def handle_text_messages(message):
-    # Obtener estado actual
     current_state = await bot.get_state(message.from_user.id, message.chat.id)
     print(f"⚪ DEBUG: Message='{message.text}', State={current_state}")
     
-    # Procesar según el estado
     if current_state == "SMAStates:ticker":
         print(f"🔴 DEBUG: Processing SMA ticker")
         await process_ticker_sma(message)
@@ -402,7 +361,6 @@ async def handle_text_messages(message):
         await process_ticker_full_data(message)
         return
     else:
-        # No hay estado activo - mensaje no reconocido
         if message.text not in ["📈 Historical Prices", "📊 SMA Analysis", "📋 Full Data", "ℹ️ Guide", "🔙 Back to Menu", "❌ Cancel"]:
             await bot.send_message(
                 message.chat.id,
@@ -430,5 +388,4 @@ if __name__ == "__main__":
     print("🚀 Stocks Bot - Iniciando...")
     print("=" * 50)
     
-    # Ejecutar el bot
     asyncio.run(main())

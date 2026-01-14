@@ -1,5 +1,3 @@
-
-
 import os
 import requests
 import pandas as pd
@@ -12,7 +10,6 @@ from postgres_create_table import RequestParams, HistPricesResults
 from config import api_key, postgres_user, postgres_password, postgres_host, postgres_port, postgres_db
 
 
-# Crear motor de base de datos
 engine = create_engine(
     f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}'
 )
@@ -23,7 +20,6 @@ def check_cache(ticker, multiplier, timespan, from_date, to_date):
 
     session = Session()
     try:
-        # Buscar parámetros de solicitud coincidentes
         request = session.query(RequestParams).filter_by(
             ticker=ticker,
             multiplier=multiplier,
@@ -33,13 +29,11 @@ def check_cache(ticker, multiplier, timespan, from_date, to_date):
         ).first()
         
         if request:
-            # Si existe, obtener los resultados
             results = session.query(HistPricesResults).filter_by(
                 request_id=request.id
             ).all()
             
             if results:
-                # Convertir a DataFrame
                 data = []
                 for result in results:
                     data.append({
@@ -70,7 +64,6 @@ def save_to_cache(ticker, multiplier, timespan, from_date, to_date, df):
 
     session = Session()
     try:
-        # Crear nuevo registro de parámetros
         request_params = RequestParams(
             ticker=ticker,
             multiplier=multiplier,
@@ -79,9 +72,8 @@ def save_to_cache(ticker, multiplier, timespan, from_date, to_date, df):
             to_date=to_date
         )
         session.add(request_params)
-        session.flush()  # Para obtener el ID
+        session.flush()
         
-        # Guardar resultados
         for index, row in df.iterrows():
             result = HistPricesResults(
                 request_id=request_params.id,
@@ -106,7 +98,6 @@ def save_to_cache(ticker, multiplier, timespan, from_date, to_date, df):
 
 def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
 
-    # Primero verificar caché
     print("🔍 Verificando caché...")
     cached_data = check_cache(ticker, multiplier, timespan, from_date, to_date)
     
@@ -116,7 +107,6 @@ def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
     
     print("📡 Consultando API de Polygon.io...")
     
-    # Construir URL de la API
     url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{from_date}/{to_date}"
     
     params = {
@@ -132,16 +122,12 @@ def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
         data = response.json()
         
         if data.get('status') == 'OK' and 'results' in data:
-            # Convertir a DataFrame
             df = pd.DataFrame(data['results'])
             
-            # Convertir timestamp (milisegundos) a datetime
             df['timestamp'] = pd.to_datetime(df['t'], unit='ms')
             
-            # Convertir de UTC a EST
             df['timestamp'] = df['timestamp'].dt.tz_localize('UTC').dt.tz_convert('US/Eastern')
             
-            # Renombrar columnas
             df = df.rename(columns={
                 'v': 'volume',
                 'o': 'open',
@@ -150,11 +136,9 @@ def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
                 'l': 'low'
             })
             
-            # Seleccionar solo las columnas necesarias
             df = df[['timestamp', 'volume', 'open', 'close', 'high', 'low']]
             df.set_index('timestamp', inplace=True)
             
-            # Guardar en caché
             save_to_cache(ticker, multiplier, timespan, from_date, to_date, df)
             
             return df
@@ -170,7 +154,6 @@ def fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date):
 def generate_chart(df, ticker, chart_type='candle', output_path='periodic_historical_fig/chart.png'):
 
     try:
-        # Configurar el estilo
         mc = mpf.make_marketcolors(
             up='green', down='red',
             edge='inherit',
@@ -184,11 +167,9 @@ def generate_chart(df, ticker, chart_type='candle', output_path='periodic_histor
             y_on_right=False
         )
         
-        # Preparar el DataFrame (mplfinance necesita columnas en mayúsculas)
         plot_df = df.copy()
         plot_df.columns = [col.capitalize() for col in plot_df.columns]
         
-        # Crear el gráfico
         if chart_type == 'candle':
             mpf.plot(
                 plot_df,
@@ -227,24 +208,20 @@ def generate_chart(df, ticker, chart_type='candle', output_path='periodic_histor
 
 def get_historical_prices_chart(ticker, multiplier, timespan, from_date, to_date, chart_type='candle'):
 
-    # Obtener datos
     df = fetch_historical_prices(ticker, multiplier, timespan, from_date, to_date)
     
     if df is None or df.empty:
         return None
     
-    # Generar nombre único para el archivo
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = f'periodic_historical_fig/{ticker}_{timestamp}.png'
     
-    # Generar gráfico
     chart_path = generate_chart(df, ticker, chart_type, output_path)
     
     return chart_path
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso
     chart = get_historical_prices_chart(
         ticker='AAPL',
         multiplier=1,

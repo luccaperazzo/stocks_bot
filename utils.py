@@ -1,6 +1,3 @@
-
-
-# Mensaje de bienvenida
 WELCOME_MESSAGE = """
 🤖 **¡Bienvenido al Stocks Bot!**
 
@@ -14,7 +11,6 @@ Puedo ayudarte con:
 Usa /Guide para ver instrucciones detalladas.
 """
 
-# Guía de uso
 GUIDE_MESSAGE = """
 📖 **GUÍA DE USO**
 
@@ -50,7 +46,6 @@ Obtiene información completa de precios de una acción.
 - Los datos son del mercado estadounidense
 """
 
-# Mensajes de error
 ERROR_INVALID_TICKER = "❌ **Error:** Ticker inválido. Debe estar en MAYÚSCULAS (ej: AAPL, TSLA)"
 ERROR_INVALID_DATE = "❌ **Error:** Fecha inválida. Formato correcto: YYYY-MM-DD (ej: 2024-01-01)"
 ERROR_INVALID_MULTIPLIER = "❌ **Error:** El multiplicador debe ser un número entero positivo"
@@ -61,13 +56,11 @@ ERROR_NO_DATA = "❌ **Error:** No se encontraron datos para los parámetros esp
 ERROR_MARKET_CLOSED = "⚠️ **Aviso:** El mercado está cerrado o es día festivo."
 ERROR_DATABASE = "❌ **Error:** Error al conectar con la base de datos."
 
-# Mensajes de éxito
 SUCCESS_GENERATING_CHART = "⏳ Generando gráfico... Por favor espera."
 SUCCESS_CALCULATING_SMA = "⏳ Calculando medias móviles... Por favor espera."
 SUCCESS_CHART_GENERATED = "✅ Gráfico generado exitosamente!"
 SUCCESS_SMA_CALCULATED = "✅ Análisis SMA completado!"
 
-# Prompts de entrada
 PROMPT_TICKER = "Ingresa el ticker de la acción (ej: AAPL, TSLA) - SOLO MAYÚSCULAS:"
 PROMPT_START_DATE = "Ingresa la fecha inicial (formato: YYYY-MM-DD):"
 PROMPT_END_DATE = "Ingresa la fecha final (formato: YYYY-MM-DD):"
@@ -75,7 +68,6 @@ PROMPT_MULTIPLIER = "Ingresa el multiplicador de tiempo (número):"
 PROMPT_PERIOD = "Selecciona el periodo:"
 PROMPT_CHART_TYPE = "Selecciona el tipo de gráfico:"
 
-# Mensajes de estado
 STATUS_FETCHING_DATA = "📡 Obteniendo datos de Polygon.io..."
 STATUS_CHECKING_CACHE = "🔍 Verificando caché en base de datos..."
 STATUS_CACHE_HIT = "✅ Datos encontrados en caché!"
@@ -83,12 +75,10 @@ STATUS_CACHE_MISS = "ℹ️ Datos no encontrados en caché. Consultando API..."
 
 
 def validate_ticker(ticker: str) -> bool:
-  
     return ticker.isupper() and ticker.isalpha() and 1 <= len(ticker) <= 10
 
 
 def validate_date(date_str: str) -> bool:
-
     from datetime import datetime
     try:
         datetime.strptime(date_str, '%Y-%m-%d')
@@ -98,7 +88,6 @@ def validate_date(date_str: str) -> bool:
 
 
 def validate_multiplier(multiplier_str: str) -> bool:
-
     try:
         mult = int(multiplier_str)
         return mult > 0
@@ -107,24 +96,20 @@ def validate_multiplier(multiplier_str: str) -> bool:
 
 
 def validate_period(period: str) -> bool:
-
     valid_periods = ['day', 'week', 'month', 'quarter', 'year']
     return period in valid_periods
 
 
 def validate_chart_type(chart_type: str) -> bool:
-
     valid_types = ['candle', 'line']
     return chart_type in valid_types
 
 
 def format_price(price: float) -> str:
-
     return f"${price:,.2f}"
 
 
 def format_large_number(num: float) -> str:
-
     if num >= 1_000_000_000:
         return f"{num/1_000_000_000:.2f}B"
     elif num >= 1_000_000:

@@ -1,11 +1,8 @@
-
-
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from config import postgres_user, postgres_password, postgres_host, postgres_port, postgres_db
 
-# Crear Base para los modelos
 Base = declarative_base()
 
 
@@ -19,7 +16,6 @@ class RequestParams(Base):
     from_date = Column(String(10), nullable=False)
     to_date = Column(String(10), nullable=False)
     
-    # Relación con hist_prices_results
     results = relationship("HistPricesResults", back_populates="request")
     
     def __repr__(self):
@@ -39,7 +35,6 @@ class HistPricesResults(Base):
     high = Column(Float, nullable=False)
     low = Column(Float, nullable=False)
     
-    # Relación con request_params
     request = relationship("RequestParams", back_populates="results")
     
     def __repr__(self):
@@ -48,12 +43,10 @@ class HistPricesResults(Base):
 
 def create_tables():
     try:
-        # Crear motor de conexión a PostgreSQL
         engine = create_engine(
             f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}'
         )
         
-        # Crear todas las tablas definidas
         Base.metadata.create_all(engine)
         
         print("✅ Tablas creadas exitosamente:")

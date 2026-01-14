@@ -1,8 +1,3 @@
-"""
-Módulo para calcular medias móviles simples (SMA) y analizar tendencias
-SMA 200 días y SMA 50 días
-"""
-
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
@@ -10,16 +5,6 @@ from config import api_key
 
 
 def calculate_sma(data, period):
-    """
-    Calcula la media móvil simple (SMA) para un periodo dado
-    
-    Args:
-        data: Serie de pandas con precios de cierre
-        period: Número de periodos para la media móvil
-    
-    Returns:
-        Valor de la SMA
-    """
     if len(data) < period:
         return None
     
@@ -27,24 +12,12 @@ def calculate_sma(data, period):
 
 
 def fetch_daily_prices(ticker, days=250):
-    """
-    Obtiene precios diarios de los últimos N días
-    
-    Args:
-        ticker: Símbolo de la acción
-        days: Número de días a obtener (por defecto 250 para cubrir SMA200)
-    
-    Returns:
-        pandas.DataFrame con precios diarios
-    """
-    # Calcular fechas - usar datos de hace unos días para evitar problemas con plan gratuito
     to_date = datetime.now() - timedelta(days=3)  # Datos de hace 3 días
     from_date = to_date - timedelta(days=days + 150)  # Extra días para compensar fines de semana
     
     from_str = from_date.strftime('%Y-%m-%d')
     to_str = to_date.strftime('%Y-%m-%d')
     
-    # Construir URL de la API
     url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/day/{from_str}/{to_str}"
     
     params = {
@@ -64,13 +37,8 @@ def fetch_daily_prices(ticker, days=250):
         print(f"📊 Results count: {len(data.get('results', []))}")
         
         if data.get('status') == 'OK' and 'results' in data and len(data['results']) > 0:
-            # Convertir a DataFrame
             df = pd.DataFrame(data['results'])
-            
-            # Convertir timestamp a datetime
             df['date'] = pd.to_datetime(df['t'], unit='ms')
-            
-            # Renombrar columnas
             df = df.rename(columns={
                 'c': 'close',
                 'o': 'open',
@@ -78,8 +46,6 @@ def fetch_daily_prices(ticker, days=250):
                 'l': 'low',
                 'v': 'volume'
             })
-            
-            # Seleccionar columnas necesarias
             df = df[['date', 'close', 'open', 'high', 'low', 'volume']]
             df.set_index('date', inplace=True)
             df = df.sort_index()
@@ -97,40 +63,26 @@ def fetch_daily_prices(ticker, days=250):
 
 
 def analyze_sma(ticker):
-    """
-    Analiza las medias móviles SMA 200 y SMA 50 para determinar tendencia
-    
-    Args:
-        ticker: Símbolo de la acción
-    
-    Returns:
-        dict con análisis de SMA
-    """
     print(f"📊 Analizando SMA para {ticker}...")
     
-    # Obtener datos históricos
     df = fetch_daily_prices(ticker, days=250)
     
     if df is None or df.empty:
         return None
     
-    # Verificar que tengamos suficientes datos
     if len(df) < 200:
         return {
             'error': f'No hay suficientes datos para calcular SMA 200 (solo {len(df)} días disponibles)'
         }
     
-    # Calcular SMAs
     close_prices = df['close']
     
     sma_200 = calculate_sma(close_prices, 200)
     sma_50 = calculate_sma(close_prices, 50) if len(df) >= 50 else None
     
-    # Precio actual (último cierre)
     current_price = close_prices.iloc[-1]
     last_date = df.index[-1]
     
-    # Determinar tendencia
     if sma_50 is None:
         trend = "Insuficientes datos para SMA 50"
         signal = "⚠️"
@@ -147,7 +99,6 @@ def analyze_sma(ticker):
         signal = "🟡"
         trend_description = "Las SMA 50 y SMA 200 están en el mismo nivel. Posible cambio de tendencia."
     
-    # Calcular porcentajes
     sma_200_pct = ((current_price - sma_200) / sma_200) * 100
     sma_50_pct = ((current_price - sma_50) / sma_50) * 100 if sma_50 else 0
     
@@ -169,15 +120,6 @@ def analyze_sma(ticker):
 
 
 def format_sma_result(result):
-    """
-    Formatea el resultado del análisis SMA en un mensaje legible
-    
-    Args:
-        result: Diccionario con resultados del análisis
-    
-    Returns:
-        String formateado para enviar al usuario
-    """
     if result is None:
         return "❌ No se pudieron obtener datos para el análisis."
     
@@ -216,20 +158,10 @@ def format_sma_result(result):
 
 
 def get_sma_analysis(ticker):
-    """
-    Función principal para obtener análisis SMA completo
-    
-    Args:
-        ticker: Símbolo de la acción
-    
-    Returns:
-        String formateado con el análisis
-    """
     result = analyze_sma(ticker)
     return format_sma_result(result)
 
 
 if __name__ == "__main__":
-    # Ejemplo de uso
     analysis = get_sma_analysis('AAPL')
     print(analysis)
