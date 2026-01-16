@@ -23,7 +23,7 @@ def fetch_ticker_details(ticker):
 
 
 def fetch_latest_quote(ticker):
-    to_date = datetime.now() - timedelta(days=3)
+    to_date = datetime.now() - timedelta(days=1)
     from_date = to_date - timedelta(days=10)
     url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/day/{from_date.strftime('%Y-%m-%d')}/{to_date.strftime('%Y-%m-%d')}"
     params = {

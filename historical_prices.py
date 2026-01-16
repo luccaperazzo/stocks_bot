@@ -222,16 +222,4 @@ def get_historical_prices_chart(ticker, multiplier, timespan, from_date, to_date
 
 
 if __name__ == "__main__":
-    chart = get_historical_prices_chart(
-        ticker='AAPL',
-        multiplier=1,
-        timespan='day',
-        from_date='2024-01-01',
-        to_date='2024-12-31',
-        chart_type='candle'
-    )
-    
-    if chart:
-        print(f"Gráfico generado: {chart}")
-    else:
-        print("No se pudo generar el gráfico")
+    pass  # Eliminar ejecución hardcodeada

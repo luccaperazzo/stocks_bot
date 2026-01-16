@@ -12,7 +12,7 @@ def calculate_sma(data, period):
 
 
 def fetch_daily_prices(ticker, days=250):
-    to_date = datetime.now() - timedelta(days=3)  # Datos de hace 3 días
+    to_date = datetime.now() - timedelta(days=1)  # Datos de hace 3 días
     from_date = to_date - timedelta(days=days + 150)  # Extra días para compensar fines de semana
     
     from_str = from_date.strftime('%Y-%m-%d')
@@ -66,6 +66,7 @@ def analyze_sma(ticker):
     print(f"📊 Analizando SMA para {ticker}...")
     
     df = fetch_daily_prices(ticker, days=250)
+    #print(df)  # Mostrar el DataFrame obtenido
     
     if df is None or df.empty:
         return None
@@ -76,12 +77,15 @@ def analyze_sma(ticker):
         }
     
     close_prices = df['close']
-    
+
     sma_200 = calculate_sma(close_prices, 200)
     sma_50 = calculate_sma(close_prices, 50) if len(df) >= 50 else None
     
+    print(sma_200, sma_50)  # Mostrar los valores calculados
+
     current_price = close_prices.iloc[-1]
     last_date = df.index[-1]
+    first_date = df.index[0]
     
     if sma_50 is None:
         trend = "Insuficientes datos para SMA 50"
@@ -105,6 +109,7 @@ def analyze_sma(ticker):
     result = {
         'ticker': ticker,
         'current_price': current_price,
+        'first_date': first_date.strftime('%Y-%m-%d'),
         'last_date': last_date.strftime('%Y-%m-%d'),
         'sma_200': sma_200,
         'sma_50': sma_50,
@@ -130,7 +135,7 @@ def format_sma_result(result):
 📊 **ANÁLISIS SMA - {result['ticker']}**
 
 **Información General:**
-📅 Fecha: {result['last_date']}
+📅 Fechas calculadas: {result['first_date']} - {result['last_date']}
 💰 Precio Actual: ${result['current_price']:.2f}
 📈 Total de días analizados: {result['total_days']}
 
